@@ -128,6 +128,9 @@ Thank you and good luck! 🙏
 
 
 Notes -
-  About the use of callbacks - When I joined the company that I learned node.js I tried implement promisses in their 'architecture' but the lead/boss said to only use callbacks(?), so It kind of 'stuck' with me since all the systems where based on callbacks. But im willing to change my culture about it over time. For the purpose if this excercise, I choose to maintained for a more solid result (lack of "routine" engineering with promisses and aysnc func) over a better readable code ( callbacks hells );
+
+  About the use of callbacks - When I joined the company that I learned node.js I tried implement promisses in their 'architecture' but the lead/boss said to only use callbacks(?), so It kind of 'stuck' with me since all the systems where based on callbacks. But im willing to change my culture about it over time. For the purpose if this excercise, I choose to user callbacks for a more solid result (lack of "routine" engineering with promisses and aysnc func) over a better readable code ( callback hells );
 
   JWT token - In a real world, i would send the profile_id in the format of a JWT token returned from a possible login, for security reasons.
+
+  Doubt - on route "/contracts" and "/jobs/unpaid" im now sure I understood the condition (client or contractor)/(either client or contractor). So in both functions I tested (contracts.ContractorId = profile_id or contracts.ClientId =  profile_id). Maybe i misunderstood one of them. But in the real world would be easily solved by talking with the responsible.

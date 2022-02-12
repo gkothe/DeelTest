@@ -41,11 +41,25 @@ test('contracts/list', (done) => {
 
 test('jobs/unpaid', (done) => {
   Cloud.get("jobs/unpaid", {}, { profile_id: 2 }, (data, error) => {
-    console.log(data)
     try {
-      // expect(data.some(({ status, ContractorId, ClientId }) => {
-      //   return (ContractorId === 4 || ClientId === 4) && (status == "in_progress" || status == "new")
-      // })).toBe(true);
+      expect(data.some(({ paid, status, ContractorId, ClientId }) => {
+        console.log(paid, status, ContractorId, ClientId)
+        return (ContractorId === 2 || ClientId === 2) && (status == "in_progress") && paid == null;
+      })).toBe(true);
+      done()
+    } catch (error) {
+      done(error)
+    }
+  })
+});
+
+
+test('jobs/pay', (done) => {
+  //must reset database to work.
+  Cloud.post("jobs/5/pay", {}, { profile_id: 4 }, (data, error) => {
+    console.log(data, error)
+    try {
+      expect(data.ok).toBeDefined();
       done()
     } catch (error) {
       done(error)

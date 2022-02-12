@@ -30,6 +30,14 @@ app.get('/jobs/unpaid', getProfile, async (req, res) => {
         send(data, error, res)
     })
 })
+
+app.post('/jobs/:job_id/pay', getProfile, async (req, res) => {
+    Jobs.postJobsPay({ ...returnParameters(req, { params: true }) }, (data, error) => {
+        send(data, error, res)
+    })
+})
+
+
 function returnParameters(req, rules = {}) {
     let ret = {};
     ret.app = req.app;
@@ -48,7 +56,11 @@ function returnParameters(req, rules = {}) {
 function send(data, error, res) {
     if (error) {
         let { msg, code, ...errorOthers } = error;
-        res.status(code).send({ msg, ...errorOthers });
+        if (msg && code) {
+            res.status(code).send({ msg, ...errorOthers });
+        } else {
+            res.status(500).send({ msg: "internal error", ...error });
+        }
     } else {
         res.send(data);
     };

@@ -67,7 +67,13 @@ module.exports = {
     if (!response || !response.json) return retorno(undefined, { msg: "not JSON" });
     var p1 = response.json();
     p1.then((responseData, error) => {
-      if (callback) return callback(responseData, error);
+      if (response.status != 200) {
+        callback(undefined, responseData);
+      } else if (error) {
+        callback(undefined, error);
+      } else {
+        callback(responseData);
+      }
     });
   },
   isObject(val) {
