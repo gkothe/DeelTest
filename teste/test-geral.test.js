@@ -17,7 +17,20 @@ test('contracts/blabla-get', (done) => {
   Cloud.get("contracts/blabla", {}, { profile_id: 1 }, (data, error) => {
     console.log(data, error)
     try {
-      expect(error);
+      expect(error).toBeDefined();
+      done()
+    } catch (error) {
+      done(error)
+    }
+  })
+});
+
+test('contracts/list', (done) => {
+  Cloud.get("contracts", {}, { profile_id: 4 }, (data, error) => {
+    try {
+      expect(data.some(({ status, ContractorId, ClientId }) => {
+        return (ContractorId === 4 || ClientId === 4) && (status == "in_progress" || status == "new")
+      })).toBe(true);
       done()
     } catch (error) {
       done(error)

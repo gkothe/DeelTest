@@ -20,7 +20,7 @@ app.get('/contracts/:id', getProfile, async (req, res) => {
     })
 })
 app.get('/contracts', getProfile, async (req, res) => {
-    Contract.getContractId({ ...returnParameters(req, { params: true }) }, (data, error) => {
+    Contract.getContractsList({ ...returnParameters(req, {}) }, (data, error) => {
         send(data, error, res)
     })
 })

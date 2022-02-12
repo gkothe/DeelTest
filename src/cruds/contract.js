@@ -33,5 +33,26 @@ module.exports = {
             if (callback) return callback(contract, null);
         } else
             if (callback) return callback(null, { code: 404, msg: "Contract not Found" });
+    },
+    async getContractsList({ app, ...params }, callback) {
+        let obj = {
+            profile_id: { value: params.profile?.id, type: 'int', required: true, msg: "Profile ID not informed or not a valid value." },
+        }
+        obj = Util.validateFields(obj);
+        if (obj.errorMsg) {
+            if (callback) return callback(null, { code: 400, msg: obj.errorMsg });
+        }
+        const { Contract } = app.get('models')
+        var query = {
+            status: {
+                [Op.or]: ["new", "in_progress"]
+            },
+            [Op.or]: [{ ClientId: obj.profile_id }, { ContractorId: obj.profile_id },]
+        };
+        const contract = await Contract.findAll({ where: query })
+        if (contract) {
+            if (callback) return callback(contract, null);
+        } else
+            if (callback) return callback(null, { code: 404, msg: "Contract not Found" });
     }
 }
