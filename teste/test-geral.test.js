@@ -2,6 +2,11 @@ require("isomorphic-fetch");
 import "babel-polyfill"
 import Cloud from "./Cloud"
 jest.setTimeout(5000);
+
+//im assuming that every time that that tests would run the database would have been the same, every time. Else some tests that modifie the database may fail on a second/third/etc run.
+//im actually not sure how test environments are organized in big companies. 
+
+
 test('contracts/1-get', (done) => {
   Cloud.get("contracts/1", {}, { profile_id: 1 }, (data, error) => {
     console.log(data)
@@ -69,7 +74,7 @@ test('jobs/pay', (done) => {
 
 
 test('balances/deposit/4-post', (done) => {
-  //must reset database to work.
+
   Cloud.post("balances/deposit/4", { deposit_value: 500 }, { profile_id: 4 }, (data, error) => {
     console.log(data, error)
     try {
@@ -83,7 +88,6 @@ test('balances/deposit/4-post', (done) => {
 
 
 test('admin/best-profession-get', (done) => {
-  //must reset database to work.
   let param = {
     start: '2020-08-15T00:00:00.000Z',
     end: '2020-08-22T23:59:59.000Z'
@@ -92,6 +96,27 @@ test('admin/best-profession-get', (done) => {
     console.log(data)
     try {
       expect(data.total).toBeDefined();
+      done()
+    } catch (error) {
+      done(error)
+    }
+  })
+});
+
+
+test('admin/best-clients-get', (done) => {
+
+  let param = {
+    start: '2020-08-15T00:00:00.000Z',
+    end: '2020-08-22T23:59:59.000Z',
+    limit: 5
+  };
+  Cloud.get("admin/best-clients", param, {}, (data, error) => {
+    console.log(data)
+    try {
+      expect(data.some(({ total }) => {
+        return (total > 0);
+      })).toBe(true);
       done()
     } catch (error) {
       done(error)

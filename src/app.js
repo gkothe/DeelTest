@@ -50,6 +50,11 @@ app.get('/admin/best-profession', getIsADm, async (req, res) => {
     })
 })
 
+app.get('/admin/best-clients', getIsADm, async (req, res) => {
+    Profiles.getBestClients({ ...returnParameters(req, { query: true }) }, (data, error) => {
+        send(data, error, res)
+    })
+})
 
 
 function returnParameters(req, rules = {}) {

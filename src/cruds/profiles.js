@@ -20,7 +20,52 @@ const dollarUSLocale = Intl.NumberFormat('en-US', {
 });
 
 module.exports = {
+    async getBestClients({ app, ...params }, callback) {
+
+        let obj = {
+            start: { value: params.start, type: 'date', required: true, msg: "Starting date not informed or not a valid value." },
+            end: { value: params.end, type: 'date', required: true, msg: "End date not informed or not a valid value." },
+            limit: { value: params.limit ? params.limit : 2, type: 'int', required: true, msg: "Limit not informed or not a valid value." },
+        }
+        obj = Util.validateFields(obj);
+        if (obj.errorMsg) {
+            if (callback) return callback(null, { code: 400, msg: obj.errorMsg });
+        }
+
+        // returns the clients the paid the most for jobs in the query time period. limit query parameter should be applied, default limit is 2.
+        let query = ` 
+            select sum(jobs.price) as total, client.firstName, client.lastName
+                  
+            from jobs 
+            inner join contracts  on contracts.id = jobs.ContractId
+            inner join profiles as client  on client.id = contracts.clientId
+            
+            where paid = 1
+            and jobs.paymentDate between ? and ?
+            group by client.firstName, client.lastName
+            limit ?
+            `
+
+        //For the sake of the exercise im not gonna set any timezone on the moment object (also im not even sure if I would need, since supposedly it comes in the input it self, I would be asking for someone in the team about this.  ).
+        //im assuming that the incoming input is something that moment understands. Its also testing inside the validateFields with moment.
+        
+        let replacements = [
+            moment(obj.start).format("YYYY-MM-DDTHH:MM:SS"),
+            moment(obj.end).format("YYYY-MM-DDTHH:MM:SS"),
+            obj.limit,
+        ];
+        console.log(replacements)
+        const job_query = await app.get('sequelize').query(query, { replacements, type: QueryTypes.SELECT });
+
+        if (!job_query || job_query.length === 0) {
+            throw ({ code: 404, msg: "No jobs where paid in the given interval." });
+        }
+
+        if (callback) return callback(job_query, null);
+
+    },
     async getBestProffesion({ app, ...params }, callback) {
+
         let obj = {
             start: { value: params.start, type: 'date', required: true, msg: "Starting date not informed or not a valid value." },
             end: { value: params.end, type: 'date', required: true, msg: "End date not informed or not a valid value." },
@@ -30,11 +75,7 @@ module.exports = {
             if (callback) return callback(null, { code: 400, msg: obj.errorMsg });
         }
 
-
-        if (obj.deposit_value === 0) {
-            throw ({ code: 422, msg: "You cannot deposit a amount of $0.00" });
-        }
-
+        //Returns the profession that earned the most money (sum of jobs paid) for any contactor that worked in the query time range.
         let query = ` 
             select sum(jobs.price) as total, contractor.profession
                   
@@ -47,21 +88,21 @@ module.exports = {
             group by  contractor.profession order by total desc
             `
 
-        //Date are always a bit tricky. not sure about the timezone and when dealing with something international, for the sake of the exercise im not gonna set any timezone on the moment object.
-        //im assuming that the incoming inout is something that moment understands. Its also testing inside the validateFields with moment.
+        //Date are always a bit tricky. not sure about the timezone and when dealing with something international.
+        //For the sake of the exercise im not gonna set any timezone on the moment object (also im not even sure if I would need, since supposedly it comes in the input it self, I would be asking for someone in the team about this.  ).
+        //im assuming that the incoming input is something that moment understands. Its also testing inside the validateFields with moment.
         //also not sure about what field to use in the where, so im using paymentDate. but maybe it should be jobs.createdAt or contracts.createdAt?
         let replacements = [
             moment(obj.start).format("YYYY-MM-DDTHH:MM:SS"),
             moment(obj.end).format("YYYY-MM-DDTHH:MM:SS"),
         ];
-        console.log(replacements)
-        const job_query = await app.get('sequelize').query(query, { replacements, type: QueryTypes.SELECT });
+        const queryresult = await app.get('sequelize').query(query, { replacements, type: QueryTypes.SELECT });
 
-        if (!job_query || job_query.length === 0) {
+        if (!queryresult || queryresult.length === 0) {
             throw ({ code: 404, msg: "No jobs where made in the given interval." });
         }
 
-        if (callback) return callback(job_query[0], null);
+        if (callback) return callback(queryresult[0], null);
 
     },
     async postBalanceDeposit({ app, ...params }, callback) {
@@ -88,7 +129,7 @@ module.exports = {
 
             let sequelize = app.get('sequelize');
             transaction = await sequelize.transaction();
-            
+
             let query = ` 
             select sum(price) as value_to_pay, client.balance
                     
