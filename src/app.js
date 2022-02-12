@@ -2,8 +2,9 @@ const { sequelize } = require('./model')
 const express = require('express');
 const bodyParser = require('body-parser');
 // const { getContractId } = require('./functions')
-const Contract = require('./cruds/contract');
+const Contract = require('./cruds/contracts');
 const Jobs = require('./cruds/jobs');
+const Profiles = require('./cruds/profiles');
 const { getProfile } = require('./middleware/getProfile')
 const app = express();
 
@@ -37,6 +38,12 @@ app.post('/jobs/:job_id/pay', getProfile, async (req, res) => {
     })
 })
 
+app.post('/balances/deposit/:userId', getProfile, async (req, res) => {
+    Profiles.postBalanceDeposit({ ...returnParameters(req, { params: true, body: true }) }, (data, error) => {
+        send(data, error, res)
+    })
+})
+
 
 function returnParameters(req, rules = {}) {
     let ret = {};
@@ -59,7 +66,7 @@ function send(data, error, res) {
         if (msg && code) {
             res.status(code).send({ msg, ...errorOthers });
         } else {
-            res.status(500).send({ msg: "internal error", ...error });
+            res.status(500).send({ msg: "Internal error", ...error });
         }
     } else {
         res.send(data);

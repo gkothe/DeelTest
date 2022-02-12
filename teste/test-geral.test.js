@@ -66,3 +66,17 @@ test('jobs/pay', (done) => {
     }
   })
 });
+
+
+test('balances/deposit/4-post', (done) => {
+  //must reset database to work.
+  Cloud.post("balances/deposit/4", { deposit_value: 500 }, { profile_id: 4 }, (data, error) => {
+    console.log(data, error)
+    try {
+      expect(data.ok).toBeDefined();
+      done()
+    } catch (error) {
+      done(error)
+    }
+  })
+});

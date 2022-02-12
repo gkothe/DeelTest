@@ -1,6 +1,6 @@
 
 const Util = require('../util.js');
-const { QueryTypes, Sequelize } = require("sequelize");
+const { QueryTypes } = require("sequelize");
 /**
 TAale:
         id	
