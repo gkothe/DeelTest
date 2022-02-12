@@ -5,15 +5,28 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "4.17.1",
+    "moment-timezone": "^0.5.34",
     "sequelize": "^6.3.4",
     "sqlite3": "^4.0.1"
   },
   "scripts": {
     "start": "nodemon ./src/server.js",
-    "seed": "node ./scripts/seedDb.js"
+    "seed": "node ./scripts/seedDb.js",
+    "t": "jest -t"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.2",
+    "@babel/plugin-transform-modules-commonjs": "^7.16.8",
+    "@babel/preset-env": "^7.16.11",
+    "babel": "^5.8.23",
+    "babel-core": "^5.8.23",
+    "babel-jest": "^27.5.1",
+    "babel-loader": "^5.3.2",
+    "babel-polyfill": "^6.26.0",
     "concurrently": "4.1.0",
+    "isomorphic-fetch": "^3.0.0",
+    "jest": "^27.5.1",
+    "node-fetch": "^2.6.7",
     "nodemon": "1.19.1"
   },
   "engines": {
