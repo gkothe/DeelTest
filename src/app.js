@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const Contract = require('./cruds/contracts');
 const Jobs = require('./cruds/jobs');
 const Profiles = require('./cruds/profiles');
-const { getProfile } = require('./middleware/getProfile')
+const { getProfile, getIsADm } = require('./middleware/getProfile')
 const app = express();
 
 app.use(bodyParser.json());
@@ -43,6 +43,13 @@ app.post('/balances/deposit/:userId', getProfile, async (req, res) => {
         send(data, error, res)
     })
 })
+
+app.get('/admin/best-profession', getIsADm, async (req, res) => {
+    Profiles.getBestProffesion({ ...returnParameters(req, { query: true }) }, (data, error) => {
+        send(data, error, res)
+    })
+})
+
 
 
 function returnParameters(req, rules = {}) {

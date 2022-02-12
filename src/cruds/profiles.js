@@ -1,6 +1,7 @@
 
 const Util = require('../util.js');
 const { QueryTypes, } = require("sequelize");
+const moment = require("moment-timezone");
 /**
 TAale:
      id,
@@ -19,6 +20,50 @@ const dollarUSLocale = Intl.NumberFormat('en-US', {
 });
 
 module.exports = {
+    async getBestProffesion({ app, ...params }, callback) {
+        let obj = {
+            start: { value: params.start, type: 'date', required: true, msg: "Starting date not informed or not a valid value." },
+            end: { value: params.end, type: 'date', required: true, msg: "End date not informed or not a valid value." },
+        }
+        obj = Util.validateFields(obj);
+        if (obj.errorMsg) {
+            if (callback) return callback(null, { code: 400, msg: obj.errorMsg });
+        }
+
+
+        if (obj.deposit_value === 0) {
+            throw ({ code: 422, msg: "You cannot deposit a amount of $0.00" });
+        }
+
+        let query = ` 
+            select sum(jobs.price) as total, contractor.profession
+                  
+            from jobs 
+            inner join contracts  on contracts.id = jobs.ContractId
+            inner join profiles as contractor  on contractor.id = contracts.ContractorId
+            
+            where paid = 1
+            and jobs.paymentDate between ? and ?
+            group by  contractor.profession order by total desc
+            `
+
+        //Date are always a bit tricky. not sure about the timezone and when dealing with something international, for the sake of the exercise im not gonna set any timezone on the moment object.
+        //im assuming that the incoming inout is something that moment understands. Its also testing inside the validateFields with moment.
+        //also not sure about what field to use in the where, so im using paymentDate. but maybe it should be jobs.createdAt or contracts.createdAt?
+        let replacements = [
+            moment(obj.start).format("YYYY-MM-DDTHH:MM:SS"),
+            moment(obj.end).format("YYYY-MM-DDTHH:MM:SS"),
+        ];
+        console.log(replacements)
+        const job_query = await app.get('sequelize').query(query, { replacements, type: QueryTypes.SELECT });
+
+        if (!job_query || job_query.length === 0) {
+            throw ({ code: 404, msg: "No jobs where made in the given interval." });
+        }
+
+        if (callback) return callback(job_query[0], null);
+
+    },
     async postBalanceDeposit({ app, ...params }, callback) {
         //1. ***POST*** `/balances/deposit/:userId` - Deposits money into the the the balance of a client, a client can't deposit more than 25% his total of jobs to pay. (at the deposit moment)
         //so this was a little confusing, why im receveing the userId if i already have the profile_id? is there someone else trying to deposit for the user?
@@ -43,7 +88,7 @@ module.exports = {
 
             let sequelize = app.get('sequelize');
             transaction = await sequelize.transaction();
-            //test if the job is from the client.
+            
             let query = ` 
             select sum(price) as value_to_pay, client.balance
                     

@@ -6,4 +6,15 @@ const getProfile = async (req, res, next) => {
     req.profile = profile;
     next();
 }
-module.exports = { getProfile }
+
+const getIsADm = async (req, res, next) => {
+    //There shoould be some testing here if the user making the request is a ADM, a JWT token in the header that decrypted would look something like this:
+    let obj = { id: 1, permissions: { adm: true } };
+    if (obj && obj.permissions && obj.permissions.adm === true) {
+        next();
+    } else {
+        return res.status(401).end()
+    }
+}
+
+module.exports = { getIsADm, getProfile }

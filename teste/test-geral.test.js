@@ -80,3 +80,21 @@ test('balances/deposit/4-post', (done) => {
     }
   })
 });
+
+
+test('admin/best-profession-get', (done) => {
+  //must reset database to work.
+  let param = {
+    start: '2020-08-15T00:00:00.000Z',
+    end: '2020-08-22T23:59:59.000Z'
+  };
+  Cloud.get("admin/best-profession", param, {}, (data, error) => {
+    console.log(data)
+    try {
+      expect(data.total).toBeDefined();
+      done()
+    } catch (error) {
+      done(error)
+    }
+  })
+});
