@@ -136,3 +136,7 @@ Notes -
   Doubt - on route "/contracts" and "/jobs/unpaid" im not sure I understood the condition (client or contractor)/(either client or contractor). So in both functions I tested (contracts.ContractorId = profile_id or contracts.ClientId =  profile_id). Normally I would question the responsible about this.
 
   Profiles.postBalanceDeposit - There some notes inside the function;
+  
+  Profiles.getBestClients, getBestProffesion - There some notes inside the functions;
+
+  try/catch and trasactions - I never used sequelized before, but in time I would try to find a better way of handling possible transactions (rollback/commit) than using big blocks of try catch inside the function itself. its kind of ugly. But at the moment nothing comes to mind.

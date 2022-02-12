@@ -9,7 +9,7 @@ TAale:
      lastName,
      profession,
      balance,
-     type,
+     type, -> client, contractor
      createdAt,
      updatedAt
 
@@ -45,7 +45,7 @@ module.exports = {
             group by client.firstName, client.lastName
             limit ?
             `
-
+        //Date are always a bit tricky. not sure about the timezone and when dealing with something international.
         //For the sake of the exercise im not gonna set any timezone on the moment object (also im not even sure if I would need, since supposedly it comes in the input it self, I would be asking for someone in the team about this.  ).
         //im assuming that the incoming input is something that moment understands. Its also testing inside the validateFields with moment.
         
@@ -54,7 +54,6 @@ module.exports = {
             moment(obj.end).format("YYYY-MM-DDTHH:MM:SS"),
             obj.limit,
         ];
-        console.log(replacements)
         const job_query = await app.get('sequelize').query(query, { replacements, type: QueryTypes.SELECT });
 
         if (!job_query || job_query.length === 0) {

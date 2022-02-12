@@ -8,7 +8,7 @@ const getProfile = async (req, res, next) => {
 }
 
 const getIsADm = async (req, res, next) => {
-    //There shoould be some testing here if the user making the request is a ADM, a JWT token in the header that decrypted would look something like this:
+    //There shoold be some testing here if the user making the request is a ADM, a JWT token in the header that decrypted would look something like this:
     let obj = { id: 1, permissions: { adm: true } };
     if (obj && obj.permissions && obj.permissions.adm === true) {
         next();
