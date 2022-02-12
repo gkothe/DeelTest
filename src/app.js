@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // const { getContractId } = require('./functions')
 const Contract = require('./cruds/contract');
+const Jobs = require('./cruds/jobs');
 const { getProfile } = require('./middleware/getProfile')
 const app = express();
 
@@ -21,6 +22,11 @@ app.get('/contracts/:id', getProfile, async (req, res) => {
 })
 app.get('/contracts', getProfile, async (req, res) => {
     Contract.getContractsList({ ...returnParameters(req, {}) }, (data, error) => {
+        send(data, error, res)
+    })
+})
+app.get('/jobs/unpaid', getProfile, async (req, res) => {
+    Jobs.getJobsUnpaid({ ...returnParameters(req, {}) }, (data, error) => {
         send(data, error, res)
     })
 })

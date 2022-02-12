@@ -37,3 +37,18 @@ test('contracts/list', (done) => {
     }
   })
 });
+
+
+test('jobs/unpaid', (done) => {
+  Cloud.get("jobs/unpaid", {}, { profile_id: 2 }, (data, error) => {
+    console.log(data)
+    try {
+      // expect(data.some(({ status, ContractorId, ClientId }) => {
+      //   return (ContractorId === 4 || ClientId === 4) && (status == "in_progress" || status == "new")
+      // })).toBe(true);
+      done()
+    } catch (error) {
+      done(error)
+    }
+  })
+});
