@@ -1,7 +1,13 @@
 
 let debugdata = false;
 const moment = require("moment-timezone");
+const dollarUSLocale = Intl.NumberFormat('en-US', {
+    style: "currency",
+    currency: "USD",
+});
+
 module.exports = {
+    dollarUSLocale,
     validateFields(objs) {
         for (const [key, obj] of Object.entries(objs)) {
             var error = { errorMsg: obj.msg ? obj.msg : "Field: " + (obj.nome ? obj.nome : key) + ". Value: " + (!obj.value ? "Not defined" : obj.value) + ". Invalid value" }
