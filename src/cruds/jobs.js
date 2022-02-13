@@ -16,7 +16,7 @@ TAale:
 
 module.exports = {
     async getJobsUnpaid({ app, ...params }, callback) {
-        let obj = {
+        var obj = {
             profile_id: { value: params.profile?.id, type: 'int', required: true, msg: "Profile ID not informed or not a valid value." },
         }
         obj = Util.validateFields(obj);
@@ -24,7 +24,7 @@ module.exports = {
             if (callback) return callback(null, { code: 400, msg: obj.errorMsg });
         }
 
-        let query = `
+        var query = `
         select jobs.*,
         contracts.ContractorId,
         contracts.ClientId,
@@ -37,7 +37,7 @@ module.exports = {
             inner join contracts   on contracts.id = jobs.ContractId
             where paid is null and status = 'in_progress' and (contracts.ContractorId = :profile_id or contracts.ClientId = :profile_id)
         `
-        const jobs = await app.get('sequelize').query(query, { replacements: { profile_id: obj.profile_id }, type: QueryTypes.SELECT });
+        var jobs = await app.get('sequelize').query(query, { replacements: { profile_id: obj.profile_id }, type: QueryTypes.SELECT });
         if (jobs) {
             if (callback) return callback(jobs, null);
         } else
@@ -45,7 +45,7 @@ module.exports = {
     },
     async postJobsPay({ app, ...params }, callback) {
 
-        let obj = {
+        var obj = {
             profile_id: { value: params.profile?.id, type: 'int', required: true, msg: "Profile ID not informed or not a valid value." },
             job_id: { value: params.job_id, type: 'int', required: true, msg: "Jobs ID not informed or not a valid value." },
         }
@@ -53,12 +53,12 @@ module.exports = {
         if (obj.errorMsg) {
             if (callback) return callback(null, { code: 400, msg: obj.errorMsg });
         }
-        let transaction = null;
+        var transaction = null;
         try {
-            let sequelize = app.get('sequelize');
+            var sequelize = app.get('sequelize');
             transaction = await sequelize.transaction();
             //test if the job is from the client.
-            let query = ` 
+            var query = ` 
                select jobs.*, 
                client. balance as client_balance, client.id as client_id, 
                contractor. balance as contractor_balance, contractor.id as contractor_id
@@ -70,7 +70,7 @@ module.exports = {
 
                where jobs.id = ? and  contracts.ClientId = ?
         `
-            const job_query = await app.get('sequelize').query(query, { transaction, replacements: [obj.job_id, obj.profile_id], type: QueryTypes.SELECT });
+            var job_query = await app.get('sequelize').query(query, { transaction, replacements: [obj.job_id, obj.profile_id], type: QueryTypes.SELECT });
             if (!job_query || job_query.length === 0) {
                 throw ({ code: 404, msg: "Job not Found" });
             }
@@ -83,16 +83,16 @@ module.exports = {
                 throw ({ code: 422, msg: "Insufficient account balance." });
             }
 
-            let newClientBalance = job.client_balance - job.price;
-            let newContractorBalance = job.contractor_balance + job.price;
+            var newClientBalance = job.client_balance - job.price;
+            var newContractorBalance = job.contractor_balance + job.price;
 
-            const Jobs = app.get('models').Job;
+            var Jobs = app.get('models').Job;
             await Jobs.update({ paid: 1, paymentDate: new Date() }, { where: { id: job.id }, transaction, })
 
-            const ClientModel = app.get('models').Profile;
+            var ClientModel = app.get('models').Profile;
             await ClientModel.update({ balance: newClientBalance, }, { where: { id: job.client_id }, transaction, })
 
-            const ContractorModel = app.get('models').Profile;
+            var ContractorModel = app.get('models').Profile;
             await ContractorModel.update({ balance: newContractorBalance, }, { where: { id: job.contractor_id }, transaction, })
 
             transaction.commit();

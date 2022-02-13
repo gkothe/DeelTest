@@ -1,7 +1,6 @@
 const { sequelize } = require('./model')
 const express = require('express');
 const bodyParser = require('body-parser');
-// const { getContractId } = require('./functions')
 const Contract = require('./cruds/contracts');
 const Jobs = require('./cruds/jobs');
 const Profiles = require('./cruds/profiles');
@@ -81,6 +80,9 @@ app.get('/admin/best-clients', getIsADm, async (req, res) => {
 
 
 function returnParameters(req, res, rules = {}) {
+
+    //this is a very persoinal design choice, for a clean coding in the routes, some poeple may not like.
+
     let ret = {};
 
     let testForkeys = testeForReserverdKeys({ ...req.query, ...req.body, ...req.params });
@@ -89,11 +91,11 @@ function returnParameters(req, res, rules = {}) {
         return false;
     }
     if (rules.query) {
-        ret = { ...ret, ...req.query };
+        ret = req.query;
+    } else if (rules.body) {
+        ret = req.body;
     }
-    if (rules.body) {
-        ret = { ...ret, ...req.body };
-    }
+
     if (rules.params) {
         ret = { ...ret, ...req.params };
     }

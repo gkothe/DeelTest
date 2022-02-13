@@ -4,7 +4,7 @@ const moment = require("moment-timezone");
 module.exports = {
     validateFields(objs) {
         for (const [key, obj] of Object.entries(objs)) {
-            let error = { errorMsg: obj.msg ? obj.msg : "Field: " + (obj.nome ? obj.nome : key) + ". Value: " + (!obj.value ? "Not defined" : obj.value) + ". Invalid value" }
+            var error = { errorMsg: obj.msg ? obj.msg : "Field: " + (obj.nome ? obj.nome : key) + ". Value: " + (!obj.value ? "Not defined" : obj.value) + ". Invalid value" }
             if (debugdata) {
                 console.log(key, obj);
             }
@@ -108,7 +108,7 @@ module.exports = {
             }
         }
 
-        let ret = {}
+        var ret = {}
         for (const [key, obj] of Object.entries(objs)) {
             ret[key] = obj.value;
         }

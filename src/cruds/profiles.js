@@ -22,7 +22,7 @@ const dollarUSLocale = Intl.NumberFormat('en-US', {
 module.exports = {
     async getBestClients({ app, ...params }, callback) {
 
-        let obj = {
+        var obj = {
             start: { value: params.start, type: 'date', required: true, msg: "Starting date not informed or not a valid value." },
             end: { value: params.end, type: 'date', required: true, msg: "End date not informed or not a valid value." },
             limit: { value: params.limit ? params.limit : 2, type: 'int', required: true, msg: "Limit not informed or not a valid value." },
@@ -33,7 +33,7 @@ module.exports = {
         }
 
         // returns the clients the paid the most for jobs in the query time period. limit query parameter should be applied, default limit is 2.
-        let query = ` 
+        var query = ` 
             select sum(jobs.price) as total, client.firstName, client.lastName
                   
             from jobs 
@@ -49,12 +49,12 @@ module.exports = {
         //For the sake of the exercise im not gonna set any timezone on the moment object (also im not even sure if I would need, since supposedly it comes in the input it self, I would be asking for someone in the team about this.  ).
         //im assuming that the incoming input is something that moment understands. Its also testing inside the validateFields with moment.
         
-        let replacements = [
+        var replacements = [
             moment(obj.start).format("YYYY-MM-DDTHH:MM:SS"),
             moment(obj.end).format("YYYY-MM-DDTHH:MM:SS"),
             obj.limit,
         ];
-        const job_query = await app.get('sequelize').query(query, { replacements, type: QueryTypes.SELECT });
+        var job_query = await app.get('sequelize').query(query, { replacements, type: QueryTypes.SELECT });
 
         if (!job_query || job_query.length === 0) {
             throw ({ code: 404, msg: "No jobs where paid in the given interval." });
@@ -65,7 +65,7 @@ module.exports = {
     },
     async getBestProffesion({ app, ...params }, callback) {
 
-        let obj = {
+        var obj = {
             start: { value: params.start, type: 'date', required: true, msg: "Starting date not informed or not a valid value." },
             end: { value: params.end, type: 'date', required: true, msg: "End date not informed or not a valid value." },
         }
@@ -75,7 +75,7 @@ module.exports = {
         }
 
         //Returns the profession that earned the most money (sum of jobs paid) for any contactor that worked in the query time range.
-        let query = ` 
+        var query = ` 
             select sum(jobs.price) as total, contractor.profession
                   
             from jobs 
@@ -91,11 +91,11 @@ module.exports = {
         //For the sake of the exercise im not gonna set any timezone on the moment object (also im not even sure if I would need, since supposedly it comes in the input it self, I would be asking for someone in the team about this.  ).
         //im assuming that the incoming input is something that moment understands. Its also testing inside the validateFields with moment.
         //also not sure about what field to use in the where, so im using paymentDate. but maybe it should be jobs.createdAt or contracts.createdAt?
-        let replacements = [
+        var replacements = [
             moment(obj.start).format("YYYY-MM-DDTHH:MM:SS"),
             moment(obj.end).format("YYYY-MM-DDTHH:MM:SS"),
         ];
-        const queryresult = await app.get('sequelize').query(query, { replacements, type: QueryTypes.SELECT });
+        var queryresult = await app.get('sequelize').query(query, { replacements, type: QueryTypes.SELECT });
 
         if (!queryresult || queryresult.length === 0) {
             throw ({ code: 404, msg: "No jobs where made in the given interval." });
@@ -110,7 +110,7 @@ module.exports = {
         //im gooing to assume that only the user can deposit for himself, so :userID == profile_id and use profile_id on the code.
         //Normally I would question the responsible about this.
 
-        let obj = {
+        var obj = {
             profile_id: { value: params.profile?.id, type: 'int', required: true, msg: "Profile ID not informed or not a valid value." },
             deposit_value: { value: params.deposit_value, type: 'float', required: true, msg: "Deposit value not informed or not a valid value." },
         }
@@ -119,17 +119,17 @@ module.exports = {
             if (callback) return callback(null, { code: 400, msg: obj.errorMsg });
         }
 
-        let transaction = null;
+        var transaction = null;
         try {
 
             if (obj.deposit_value === 0) {
                 throw ({ code: 422, msg: "You cannot deposit a amount of $0.00" });
             }
 
-            let sequelize = app.get('sequelize');
+            var sequelize = app.get('sequelize');
             transaction = await sequelize.transaction();
 
-            let query = ` 
+            var query = ` 
             select sum(price) as value_to_pay, client.balance
                     
             from jobs 
@@ -138,7 +138,7 @@ module.exports = {
 
             where  contracts.ClientId = ? and paid is null group by client.balance
             `
-            const job_query = await app.get('sequelize').query(query, { transaction, replacements: [obj.profile_id], type: QueryTypes.SELECT });
+            var job_query = await app.get('sequelize').query(query, { transaction, replacements: [obj.profile_id], type: QueryTypes.SELECT });
 
             if (!job_query || job_query.length === 0) {
                 throw ({ code: 404, msg: "You have no jobs pending to pay, no need for deposit." });
@@ -149,14 +149,14 @@ module.exports = {
                 throw ({ code: 404, msg: "You have no jobs pending to pay, no need for deposit." });
             }
 
-            let maxAmountToDesposit = rows.value_to_pay * 1.25;
+            var maxAmountToDesposit = rows.value_to_pay * 1.25;
             //Deposits money into the the the balance of a client, a client can't deposit more than 25% his total of jobs to pay. (at the deposit moment)
             //OBs: the rule doest say anything about the existing balance. Normally I would question the responsible if this should be considered.
             if (obj.deposit_value > maxAmountToDesposit) {
                 throw ({ code: 404, msg: "You can't deposit more than 25% of your total of jobs to pay. The total you have to pay is " + dollarUSLocale.format(maxAmountToDesposit) });
             }
 
-            const ClientModel = app.get('models').Profile;
+            var ClientModel = app.get('models').Profile;
             await ClientModel.update({ balance: obj.deposit_value + rows.balance }, { where: { id: obj.profile_id }, transaction, })
 
 
