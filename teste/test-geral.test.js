@@ -9,7 +9,7 @@ jest.setTimeout(5000);
 
 test('contracts/1-get', (done) => {
   Cloud.get("contracts/1", {}, { profile_id: 1 }, (data, error) => {
-    console.log(data)
+    console.log(data, error)
     try {
       expect(data.id).toBe(1);
       done()
@@ -73,9 +73,9 @@ test('jobs/pay', (done) => {
 });
 
 
-test('balances/deposit/4-post', (done) => {
+test('balances/deposit/2-post', (done) => {
 
-  Cloud.post("balances/deposit/4", { deposit_value: 500 }, { profile_id: 4 }, (data, error) => {
+  Cloud.post("balances/deposit/2", { deposit_value: 50 }, { profile_id: 2 }, (data, error) => {
     console.log(data, error)
     try {
       expect(data.ok).toBeDefined();
@@ -90,10 +90,11 @@ test('balances/deposit/4-post', (done) => {
 test('admin/best-profession-get', (done) => {
   let param = {
     start: '2020-08-15T00:00:00.000Z',
-    end: '2020-08-22T23:59:59.000Z'
+    end: '2020-08-22T23:59:59.000Z',
+    profile: 'a'
   };
   Cloud.get("admin/best-profession", param, {}, (data, error) => {
-    console.log(data)
+    console.log(data, error)
     try {
       expect(data.total).toBeDefined();
       done()
@@ -109,10 +110,11 @@ test('admin/best-clients-get', (done) => {
   let param = {
     start: '2020-08-15T00:00:00.000Z',
     end: '2020-08-22T23:59:59.000Z',
-    limit: 5
+    limit: 5,
+    app: 'a'
   };
   Cloud.get("admin/best-clients", param, {}, (data, error) => {
-    console.log(data)
+    console.log(data, error)
     try {
       expect(data.some(({ total }) => {
         return (total > 0);

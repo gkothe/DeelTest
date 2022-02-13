@@ -55,7 +55,6 @@ module.exports = {
     fetch(url, config)
       .then(response => {
         this.onResolverResponse(response, (sucess, error) => {
-          if (error) { console.log(error); }
           callback(sucess, error);
         });
       })
