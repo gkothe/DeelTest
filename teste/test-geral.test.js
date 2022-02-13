@@ -91,7 +91,6 @@ test('admin/best-profession-get', (done) => {
   let param = {
     start: '2020-08-15T00:00:00.000Z',
     end: '2020-08-22T23:59:59.000Z',
-    profile: 'a'
   };
   Cloud.get("admin/best-profession", param, {}, (data, error) => {
     console.log(data, error)
@@ -111,7 +110,6 @@ test('admin/best-clients-get', (done) => {
     start: '2020-08-15T00:00:00.000Z',
     end: '2020-08-22T23:59:59.000Z',
     limit: 5,
-    app: 'a'
   };
   Cloud.get("admin/best-clients", param, {}, (data, error) => {
     console.log(data, error)
