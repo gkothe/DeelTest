@@ -135,7 +135,7 @@ function parseInteger(string, forceThrow) {
         }
         return v;
     } catch (e) {
-        if (forcathrow) {
+        if (forceThrow) {
             return false;
         } else {
             return 0;
